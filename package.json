@@ -7,8 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon",
     "build": "tsc",
-    "db:migrate": "drizzle-kit generate:pg",
-    "db:push": "drizzle-kit push:pg",
+    "db:migrate": "drizzle-kit generate",
+    "db:push": "drizzle-kit push",
     "db:studio": "npx drizzle-kit studio --port 8976 --verbose"
   },
   "keywords": [],
@@ -30,6 +30,7 @@
   "devDependencies": {
     "@types/express": "^4.17.21",
     "@types/node": "^20.12.11",
+    "@types/nodemailer": "^6.4.15",
     "@types/pg": "^8.11.6",
     "drizzle-kit": "^0.21.1",
     "nodemon": "^3.1.0",

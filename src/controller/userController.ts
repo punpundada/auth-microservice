@@ -10,7 +10,21 @@ import { Res } from "../types/Response";
 import { ZodError, z } from "zod";
 import { emailZodSchema } from "../zodSchemas/utilsZodSchema";
 import { eq } from "drizzle-orm";
-import { generateEmailVerificationCode } from "../utils";
+import { generateEmailVerificationCode, getMailOptions } from "../utils";
+import {createTransport} from 'nodemailer';
+import 'dotenv/config'
+
+let transporter = createTransport({
+  auth:{
+    type: 'OAuth2',
+    user: process.env.MAIL_USERNAME,
+    clientId: process.env.OAUTH_CLIENTID,
+    clientSecret: process.env.OAUTH_CLIENT_SECRET,
+    refreshToken: process.env.OAUTH_REFRESH_TOKEN,
+    accessToken:process.env.OAUTH_ACCESSTOKEN,
+  },
+  service:'gmail'
+});
 
 export const userSignup = async (
   req: Request<unknown, unknown, UserInsert>,
@@ -25,14 +39,28 @@ export const userSignup = async (
     const passwordHash = await hash(validData.password, hashOptions);
 
     validData.password = passwordHash;
-
+    validData.emailVerified=false;
     const savedUser = await db
       .insert(userSchema)
       .values(validData)
       .returning({ id: userSchema.id, email: userSchema.email, name: userSchema.name });
 
     const verificationCode = await generateEmailVerificationCode(savedUser[0].id, savedUser[0].email);
-    // await sendVerificationCode(email, verificationCode);
+
+    //send varification code to the email
+    transporter.sendMail(getMailOptions(savedUser[0].email,verificationCode), async(err,data)=>{
+      if(err){
+        await db.delete(userSchema).where(eq(userSchema.id,savedUser[0].id))
+        return res.status(400).json({
+          isSuccess:false,
+          issues:[],
+          message:err.message
+        })
+      }else{
+        console.log("Email sent successfully",data);
+      }
+    })
+
     const session = await lucia.createSession(userId, {});
 
     const sessionCookie = lucia.createSessionCookie(session.id);
@@ -73,7 +101,7 @@ export const userSignup = async (
   }
 };
 
-export const usetLogin = async (
+export const userLogin = async (
   req: Request<unknown, unknown, { email: string; password: string }>,
   res: Response<
     Res<{
@@ -138,3 +166,7 @@ export const usetLogin = async (
     });
   }
 };
+
+export const varifyUserEmail=async (req:Request,res:Response) => {
+  
+}

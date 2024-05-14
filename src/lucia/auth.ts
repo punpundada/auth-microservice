@@ -3,6 +3,7 @@ import { DrizzlePostgreSQLAdapter  } from "@lucia-auth/adapter-drizzle";
 import { db } from "../server";
 import { sessionSchema } from "../db/session";
 import { userSchema } from "../db/user";
+import 'dotenv/config'
 
 export const adapter = new DrizzlePostgreSQLAdapter (db, sessionSchema, userSchema);
 
@@ -28,17 +29,14 @@ export const lucia = new Lucia(adapter, {
         name: "session",
 		attributes: {
 			secure: process.env.NODE_ENV === "PROD", // set `Secure` flag in HTTPS
-            sameSite: "strict",
-
+            // sameSite: "strict",
 		}
 	},
 	getUserAttributes: (attributes) => {
 		return {
-			// we don't need to expose the password hash!
 			email: attributes.email,
 			emailVerified: attributes.email_verified,
 		};
 	},
     sessionExpiresIn:new TimeSpan(2, "d")
 });
-

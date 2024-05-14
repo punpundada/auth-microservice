@@ -10,7 +10,7 @@ const app = express();
 
 app.use(json())
 const client = new Client({
-  connectionString: process.env.DB_CONNECTION_STR!,
+  connectionString: process.env.DB_URL!,
 });
 
 const connectClient = async () => {
