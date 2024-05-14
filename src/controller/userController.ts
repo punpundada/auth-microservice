@@ -14,6 +14,8 @@ import { generateEmailVerificationCode, getMailOptions } from "../utils";
 import {createTransport} from 'nodemailer';
 import 'dotenv/config'
 
+
+
 let transporter = createTransport({
   auth:{
     type: 'OAuth2',
@@ -61,7 +63,7 @@ export const userSignup = async (
       }
     })
 
-    const session = await lucia.createSession(userId, {});
+    const session = await lucia.createSession(userId, {country:'india'});
 
     const sessionCookie = lucia.createSessionCookie(session.id);
 
@@ -135,7 +137,7 @@ export const userLogin = async (
       });
     }
 
-    const session = await lucia.createSession(user.id, {});
+    const session = await lucia.createSession(user.id, {country:'india'});
     const sessionCookie = lucia.createSessionCookie(session.id);
     res.set("Location", "/");
     res.set("Set-Cookie", sessionCookie.serialize());
@@ -167,6 +169,6 @@ export const userLogin = async (
   }
 };
 
-export const varifyUserEmail=async (req:Request,res:Response) => {
-  
+export const varifyUserEmail=async (req:any,res:Response) => {
+  console.log(req.locals.user as any)
 }

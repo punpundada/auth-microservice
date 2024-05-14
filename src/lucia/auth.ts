@@ -5,6 +5,13 @@ import { sessionSchema } from "../db/session";
 import { userSchema } from "../db/user";
 import 'dotenv/config'
 
+interface Session {
+	id: string;
+	userId: string;
+	expiresAt: Date;
+	fresh: boolean;
+}
+
 export const adapter = new DrizzlePostgreSQLAdapter (db, sessionSchema, userSchema);
 
 export const hashOptions = {
@@ -20,6 +27,9 @@ declare module "lucia" {
 		DatabaseUserAttributes: {
 			email: string;
 			email_verified: boolean;
+		};
+		DatabaseSessionAttributes: {
+			country: string;
 		};
 	}
 }
@@ -38,5 +48,10 @@ export const lucia = new Lucia(adapter, {
 			emailVerified: attributes.email_verified,
 		};
 	},
-    sessionExpiresIn:new TimeSpan(2, "d")
+	getSessionAttributes:(attr)=>{
+		return {
+			country: attr.country
+		}
+	},
+    sessionExpiresIn:new TimeSpan(1, "w")
 });

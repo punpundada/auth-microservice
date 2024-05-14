@@ -1,6 +1,8 @@
 import { Router } from "express";
-import { userSignup } from "../controller/userController";
+import { userLogin, userSignup, varifyUserEmail } from "../controller/userController";
 
-const userRoutes = Router()
+export const userRoutes = Router()
 
 userRoutes.post('/signup',userSignup)
+// userRoutes.post('/email-verification',varifyUserEmail)
+// userRoutes.post('login',userLogin)
